@@ -1,0 +1,82 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        app: mongodb
+  template:
+    metadata:
+      name: mongodb-pod
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb-container
+          image: mongo
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: root
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: password
+          ports:
+            - containerPort: 27017
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - port: 27017
+      targetPort: 27017
+          
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongoexpress-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongoexpress
+  template:
+    metadata:
+      name: mongoexpress-pod
+      labels:
+        app: mongoexpress
+    spec:
+      containers:
+        - name: mongoexpress-container
+          image: mongo-express
+          ports: 
+            - containerPort: 8081
+          env:
+            - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+              value: root
+            - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+              value: password
+            - name: ME_CONFIG_MONGODB_SERVER
+              value: mongodb-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongoexpress-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: mongoexpress
+  ports:
+    - nodePort: 30000
+      port: 8083
+      targetPort: 8081
+          

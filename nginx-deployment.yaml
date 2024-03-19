@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  #annotations:
+   # kubernetes.io/change-cause: "updating to 1.21 version"
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - image:  nginx:1.21
+          name: nginxdeploymentcontainer
+          ports:
+            - containerPort: 80
+          
